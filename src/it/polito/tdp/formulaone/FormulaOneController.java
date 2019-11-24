@@ -4,6 +4,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.formulaone.model.Model;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -22,7 +24,7 @@ public class FormulaOneController {
     private URL location;
 
     @FXML // fx:id="boxAnno"
-    private ComboBox<?> boxAnno; // Value injected by FXMLLoader
+    private ComboBox<Integer> boxAnno; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnSelezionaStagione"
     private Button btnSelezionaStagione; // Value injected by FXMLLoader
@@ -45,6 +47,8 @@ public class FormulaOneController {
     @FXML
     void doSelezionaStagione(ActionEvent event) {
     	txtResult.setText("btn Seleziona stagione premuto");
+    	int s = boxAnno.getValue();
+    	model.creaGrafo(model.getGare(s));
     }
 
     @FXML
@@ -65,6 +69,9 @@ public class FormulaOneController {
 
 	public void setModel(Model model) {
 		this.model = model;
+		ObservableList<Integer> stagione = FXCollections.observableList(model.getStagioni());
+		boxAnno.setItems(stagione);
+		boxAnno.setValue(stagione.get(0));
 		
 	}
 }
