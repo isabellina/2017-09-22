@@ -4,6 +4,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.formulaone.model.Model;
+import it.polito.tdp.formulaone.model.Race;
+import it.polito.tdp.formulaone.model.Simulatore;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -30,7 +32,7 @@ public class FormulaOneController {
     private Button btnSelezionaStagione; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxGara"
-    private ComboBox<?> boxGara; // Value injected by FXMLLoader
+    private ComboBox<Race> boxGara; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnSimulaGara"
     private Button btnSimulaGara; // Value injected by FXMLLoader
@@ -46,14 +48,31 @@ public class FormulaOneController {
 
     @FXML
     void doSelezionaStagione(ActionEvent event) {
-    	txtResult.setText("btn Seleziona stagione premuto");
+    	//txtResult.setText("btn Seleziona stagione premuto");
     	int s = boxAnno.getValue();
     	model.creaGrafo(model.getGare(s));
+    	ObservableList<Race> races = FXCollections.observableList(model.getGare(s));
+    	boxGara.setItems(races);
+    	boxGara.setValue(races.get(0));
+    	txtResult.setText("l'arco di peso maggiore e' " + model.arcoPesoMax());
     }
 
     @FXML
     void doSimulaGara(ActionEvent event) {
     	txtResult.setText("btn simula gara premuto");
+    	
+    	Simulatore s = new Simulatore();
+    	try {
+    		s.init(Double.parseDouble(textInputK.getText()), Integer.parseInt(textInputK1.getText()), model.maxGiri(boxGara.getValue().getRaceId()), boxGara.getValue().getRaceId());
+    		s.run();
+    		txtResult.setText(s.getClassifica());
+    	}
+    	catch(NumberFormatException n) {
+    		textInputK.clear();
+    		textInputK1.clear();
+    		txtResult.setText("Inserisci dei numeri!!!");
+    	}
+    	
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete

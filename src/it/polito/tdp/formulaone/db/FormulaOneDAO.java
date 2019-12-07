@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import it.polito.tdp.formulaone.model.Pilota;
 import it.polito.tdp.formulaone.model.Race;
 import it.polito.tdp.formulaone.model.Season;
 
@@ -34,7 +35,7 @@ public class FormulaOneDAO {
 	}
 	
 	public List<Race> getGare(Year y){
-		String sql = "Select raceId,year,circuitId,name  where year= ? " ;
+		String sql = "Select raceId,year,circuitId,name from races  where year= ? " ;
 		try {
 			Connection conn = DBConnect.getConnection();
 			PreparedStatement st = conn.prepareStatement(sql);
@@ -54,7 +55,7 @@ public class FormulaOneDAO {
 	}
 	
 	public boolean getPilotaGare(int driverId, int raceId1, int raceId2) {
-		String sql = "select (count(driverId)=2) as ret from (select driverId from results where (raceId=? or raceId=?) and (statusId=1) and driverId=?) as alias;)";
+		String sql = "select (count(alias.driverId) = 2) as ret from ((select driverId from results where (raceId=? or raceId=?) and (statusId=1) and driverId=?) as alias)";
 		try {
 			boolean ret = false;
 			Connection conn = DBConnect.getConnection();
@@ -95,4 +96,68 @@ public class FormulaOneDAO {
 		}
 		
 	}
+	
+	public int totGiri(int raceId) {
+		int ret = -1;
+		String sql = "select max(lap) as laps from lapTimes where raceid=? ;" ;
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1,raceId);
+			ResultSet rs = st.executeQuery();
+			if(rs.next()) {
+				ret = rs.getInt("laps") ;
+			}
+			conn.close();
+			
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	
+	public List<Pilota> getPilotiGara(int raceId){
+		System.out.println(raceId);
+		String sql = "select distinct lapTimes.driverId as driverId, maxvalues.maxLap as maxLap from (select max(lap) as maxLap, driverId from lapTimes group by driverId) as maxvalues inner join lapTimes on lapTimes.driverId=maxvalues.driverId where lapTimes.raceId=?;"; 
+		try{
+			List<Pilota> piloti = new LinkedList<Pilota>();
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1,raceId);
+			ResultSet rs = st.executeQuery();
+			while(rs.next()) {
+				System.out.println("new pilota...");
+				piloti.add(new Pilota(rs.getInt("driverId"), 0, 0,rs.getInt("maxLap")));
+			}
+			conn.close();
+			return piloti;
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public int tempoGiro(int raceId, int driverId, int lap) {
+		int ret= -1;
+		String sql = "select milliseconds from lapTimes where raceId=? and driverId=? and lap =? " ;
+		try{
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1,raceId);
+			st.setInt(2,driverId);
+			st.setInt(3,lap);
+			ResultSet rs = st.executeQuery();
+			if(rs.next()) {
+				ret = rs.getInt("milliseconds");
+			}
+			conn.close();
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	
 }

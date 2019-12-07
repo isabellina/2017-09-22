@@ -44,11 +44,10 @@ public class Model {
 		for(Race a: grafo.vertexSet()) {
 			 for(Race s: grafo.vertexSet()) {
 					if(!a.equals(s)) {
-				MyEdge edge = 	grafo.addEdge(a, s );
-				if(edge!=null) {
-					edge.setWeight(this.getWeight(a.getRaceId(), s.getRaceId()));
-				}
-					
+						MyEdge edge = 	grafo.addEdge(a, s );
+						if(edge!=null) {
+							edge.setWeight(this.getWeight(a.getRaceId(), s.getRaceId()));
+						}
 					}
 				}
 		}
@@ -68,20 +67,34 @@ public class Model {
 	}
 	
 	
+	//cerco l'arco di peso massimo voglio stampare una stringa con i vertici e il loro peso vicino;
 	
+	public String arcoPesoMax() {
+		String ret="";
+		double maxPeso = 0.0;
+		
+		 for(MyEdge i: this.grafo.edgeSet()){
+			 System.out.println("Archi : " + i.getWeight());
+			if(i.getWeight()>maxPeso) {
+				maxPeso = i.getWeight();
+			}
+		}
+		 for(MyEdge e: this.grafo.edgeSet()) {
+			 if(e.getWeight()== maxPeso) {
+				 ret += e.getWeight()+ " " + e.getSource() + " " + e.getTarget() + "\n";
+			 }
+		 }
+		
+		return ret;
+	}
 	
+	public int maxGiri(int raceId) {
+		return this.dao.totGiri(raceId);
+	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	public List<Pilota> getPiloti (int raceId){
+		return this.dao.getPilotiGara(raceId);
+	}
 	
 	
 	

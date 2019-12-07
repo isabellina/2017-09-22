@@ -14,6 +14,14 @@ public class MyEdge extends DefaultWeightedEdge {
 		this.weight = weight;
 	}
 	
+	public Object getSource() {
+		return super.getSource();
+	}
+	
+	public Object getTarget() {
+		return super.getTarget();
+	}
+	
 	
 	
 	
